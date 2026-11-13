@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>大專院校 3D 校園地圖</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><defs><linearGradient id='t' x1='0' y1='0' x2='1' y2='1'><stop offset='0' stop-color='%23FFC163'/><stop offset='.55' stop-color='%23F08A12'/><stop offset='1' stop-color='%23C85E00'/></linearGradient></defs><rect width='32' height='32' rx='9' fill='url(%23t)'/><g transform='translate(4 4)'><path d='M6.6 9.6 12 12.4 17.4 9.6V14.1c0 1.7-2.4 3-5.4 3s-5.4-1.3-5.4-3Z' fill='%23fff' fill-opacity='.72'/><path d='M12 3.4 21.2 7.9 12 12.4 2.8 7.9Z' fill='%23fff'/><path d='M12 7.9 19.4 9.7V15' stroke='%23fff' stroke-width='1.2' fill='none' stroke-linecap='round'/><path d='M18.5 15h1.8l.45 3.2h-2.7Z' fill='%23fff'/></g></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=JetBrains+Mono:wght@500;600&family=Noto+Sans+TC:wght@400;500;700;900&display=swap">
@@ -389,6 +390,163 @@ button{font-family:inherit;color:inherit}
   .hbar h1{font-size:15px}
   .map-hint{bottom:calc(42vh + 24px)}
 }
+
+/* =====================================================================
+   LIQUID GLASS — one material for every surface.
+   Panels = thick frosted glass (legible text). Controls = thin clear glass.
+   Selected item in a group = a bright "lens". Toggled on = amber-tinted glass.
+   The rim / specular light is all inset box-shadow, so it costs no extra layers.
+   ===================================================================== */
+.app{
+  --g-panel:rgba(250,251,253,.50); --g-fill:rgba(255,255,255,.30); --g-fill-h:rgba(255,255,255,.62);
+  --g-sheen:rgba(255,255,255,.62); --g-rim:rgba(255,255,255,.58); --g-hi:rgba(255,255,255,.96); --g-lo:rgba(255,255,255,.28);
+  --g-edge:rgba(22,32,48,.10); --g-well:rgba(22,32,48,.06);
+  --g-shadow:0 1px 1px rgba(16,24,40,.05),0 14px 34px -14px rgba(16,24,40,.34);
+  --g-btn-shadow:0 1px 1px rgba(16,24,40,.05),0 5px 14px -7px rgba(16,24,40,.32);
+  --lens:linear-gradient(180deg,rgba(255,255,255,.96),rgba(255,255,255,.66));
+  --lens-shadow:inset 0 0 0 1px rgba(255,255,255,.95),inset 0 -1.5px 1px rgba(255,255,255,.5),0 0 0 .5px rgba(22,32,48,.10),0 6px 16px -6px rgba(16,24,40,.34);
+  --g-tint:color-mix(in srgb,var(--accent) 24%,rgba(255,255,255,.42));
+  --line:rgba(22,32,48,.10);
+  --ambient-a:rgba(255,168,64,.30); --ambient-b:rgba(86,140,235,.22); --ambient-c:rgba(70,200,180,.14);
+}
+.app[data-scene="sunset"]{--g-panel:rgba(255,246,238,.50); --g-fill:rgba(255,242,230,.32); --ambient-a:rgba(255,120,60,.32); --ambient-b:rgba(200,110,190,.20)}
+.app[data-scene="night"]{
+  --g-panel:rgba(26,30,38,.56); --g-fill:rgba(70,78,92,.26); --g-fill-h:rgba(110,120,140,.36);
+  --g-sheen:rgba(255,255,255,.13); --g-rim:rgba(255,255,255,.15); --g-hi:rgba(255,255,255,.30); --g-lo:rgba(255,255,255,.05);
+  --g-edge:rgba(0,0,0,.45); --g-well:rgba(0,0,0,.24);
+  --g-shadow:0 1px 1px rgba(0,0,0,.3),0 18px 42px -14px rgba(0,0,0,.75);
+  --g-btn-shadow:0 1px 1px rgba(0,0,0,.3),0 6px 16px -8px rgba(0,0,0,.7);
+  --lens:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.09));
+  --lens-shadow:inset 0 0 0 1px rgba(255,255,255,.24),inset 0 1px 0 rgba(255,255,255,.34),0 0 0 .5px rgba(0,0,0,.5),0 6px 16px -6px rgba(0,0,0,.7);
+  --g-tint:color-mix(in srgb,var(--accent) 30%,rgba(255,255,255,.05));
+  --line:rgba(255,255,255,.09);
+  --ambient-a:rgba(255,150,60,.16); --ambient-b:rgba(90,120,255,.20); --ambient-c:rgba(60,190,200,.08);
+}
+
+/* ---------- panels ---------- */
+.glass{
+  background:linear-gradient(162deg,var(--g-sheen),transparent 32%),var(--g-panel);
+  -webkit-backdrop-filter:blur(24px) saturate(1.9);backdrop-filter:blur(24px) saturate(1.9);
+  border:0;border-radius:24px;
+  box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),inset 0 0 24px -10px var(--g-sheen),0 0 0 .5px var(--g-edge),var(--g-shadow);
+}
+.hint.glass,.map-hint.glass,.hlegend.glass{border-radius:999px}
+.tooltip.glass{border-radius:16px}
+.wip-card.glass{border-radius:30px}
+.bar,.hbar,.tools{border-radius:22px}
+
+/* ---------- controls: clear glass ---------- */
+.icon-btn,.home-back,.back-btn,.focus-btn,.wip-actions button,.drone,.compass,.x-btn,.tod-knob,.zone-btn,.chk{
+  border:0;color:var(--ink);
+  background:radial-gradient(90% 90% at var(--gx,35%) var(--gy,0%),var(--g-sheen),transparent 62%),var(--g-fill);
+  box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi),inset 0 -1px 1px var(--g-lo),0 0 0 .5px var(--g-edge),var(--g-btn-shadow);
+  transition:background-color .25s,color .2s,box-shadow .25s,transform .45s var(--spring);
+}
+.icon-btn:hover,.home-back:hover,.back-btn:hover,.focus-btn:hover,.wip-actions button:hover,.drone:hover,.compass:hover,.x-btn:hover,.tod-knob:hover,.zone-btn:hover,.chk:hover{
+  background:radial-gradient(90% 90% at var(--gx,35%) var(--gy,0%),var(--g-hi),transparent 66%),var(--g-fill-h);border-color:transparent}
+.icon-btn:active,.home-back:active,.back-btn:active,.focus-btn:active,.wip-actions button:active,.drone:active,.compass:active,.x-btn:active,.tod-knob:active,.zone-btn:active,.chk:active{transform:scale(.92)}
+.icon-btn,.home-back,.x-btn,.compass,.tod-knob{border-radius:50%}
+.icon-btn{color:var(--ink)}
+.icon-btn svg{stroke-width:1.9}
+.home-back{width:40px;height:40px}
+.back-btn,.focus-btn,.wip-actions button,.drone,.zone-btn,.chk{border-radius:999px}
+.x-btn{width:28px;height:28px}
+.chk{padding:7px 12px 7px 10px;color:var(--ink);font-weight:600}
+
+/* toggled on = amber-tinted glass */
+.icon-btn[aria-pressed="true"],.drone.on{color:var(--accent-ink);
+  background:radial-gradient(90% 90% at var(--gx,35%) var(--gy,0%),var(--g-sheen),transparent 62%),var(--g-tint);
+  box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 38%,var(--g-rim)),inset 0 1px 0 var(--g-hi),inset 0 -1px 1px var(--g-lo),0 0 0 .5px var(--g-edge),0 6px 18px -8px color-mix(in srgb,var(--accent) 70%,transparent)}
+.drone::before,.drone.on::before{display:none}
+
+/* selected in a group = lens */
+.seg{border-radius:999px;background:var(--g-well);box-shadow:inset 0 1px 2px rgba(0,0,0,.07),inset 0 0 0 1px color-mix(in srgb,var(--g-rim) 40%,transparent)}
+.seg button{border-radius:999px}
+.seg-thumb{border-radius:999px;background:var(--lens);box-shadow:var(--lens-shadow)}
+.zone-btn.on,.cam-btn.on{background:var(--lens);box-shadow:var(--lens-shadow);color:var(--ink);font-weight:700}
+.cam-btn{border-radius:999px;transition:background .25s,color .2s,box-shadow .25s,transform .45s var(--spring)}
+.cam-btn:hover{background:var(--g-fill);box-shadow:inset 0 0 0 1px var(--g-rim)}
+.cam-btn:active{transform:scale(.94)}
+.rail-sep{background:var(--line)}
+.cams{border-radius:999px;padding:6px 7px}
+
+/* search = recessed glass well */
+.search input{border:0;border-radius:999px;background:var(--g-well);box-shadow:inset 0 1px 2px rgba(0,0,0,.08),inset 0 0 0 1px color-mix(in srgb,var(--g-rim) 45%,transparent)}
+.search input:focus{box-shadow:inset 0 1px 2px rgba(0,0,0,.08),0 0 0 3px var(--accent-soft),inset 0 0 0 1px color-mix(in srgb,var(--accent) 60%,transparent)}
+
+/* list rows */
+.bld,.crow,.pk-item{border:0;border-radius:14px;transition:background .25s,box-shadow .25s,transform .35s cubic-bezier(.22,1,.36,1)}
+.bld:hover,.crow:hover,.crow.hot,.pk-item:hover{transform:none;background:var(--g-fill);box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi)}
+.bld.on{background:var(--g-tint);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 40%,var(--g-rim)),inset 0 1px 0 var(--g-hi)}
+.code-chip,.pin-code{border-radius:7px}
+.stat{border-radius:999px;background:var(--g-well);box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--g-rim) 40%,transparent)}
+.tag{border-radius:999px}
+
+/* minimap, pins, road tags */
+#minimap-canvas{border:0;border-radius:16px;box-shadow:inset 0 0 0 1px var(--g-rim),0 0 0 .5px var(--g-edge)}
+.mini.glass{border-radius:24px}
+.pin-body{border:0;border-radius:999px;padding:3px 9px 3px 4px;background:linear-gradient(160deg,var(--g-sheen),transparent 45%),var(--g-panel);
+  box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi),0 0 0 .5px var(--g-edge),0 6px 14px -6px rgba(0,0,0,.35)}
+.pin-code{border-radius:999px}
+.active-pin .pin-body{box-shadow:inset 0 0 0 1.5px var(--accent),inset 0 1px 0 var(--g-hi),0 0 0 4px var(--accent-soft),0 0 22px var(--glow)}
+.road-label-3d{border:0;background:linear-gradient(160deg,var(--g-sheen),transparent 50%),var(--g-panel);box-shadow:inset 0 0 0 1px var(--g-rim),0 0 0 .5px var(--g-edge)}
+.road-label-3d[data-tone="arterial"]{box-shadow:inset 0 0 0 1px color-mix(in srgb,var(--accent) 45%,var(--g-rim)),0 0 0 .5px var(--g-edge)}
+.road-label-3d[data-tone="gate"]{border:1px dashed var(--g-rim)}
+.stripe{border-radius:999px}
+
+/* ---------- logo: amber glass tile with a frosted-white cap ---------- */
+.mark{position:relative;overflow:hidden;border-radius:30%;
+  background:linear-gradient(150deg,#FFC163 0%,#F08A12 52%,#C85E00 100%);
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.42),inset 0 1.5px 0 rgba(255,255,255,.85),inset 0 -2px 4px rgba(120,50,0,.35),inset 0 0 12px rgba(255,236,200,.35),0 0 0 .5px rgba(120,60,0,.25),0 6px 16px -6px rgba(200,94,0,.55)}
+.mark::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:inherit;
+  background:radial-gradient(120% 75% at 28% -8%,rgba(255,255,255,.75),rgba(255,255,255,0) 58%),radial-gradient(80% 50% at 80% 112%,rgba(255,220,170,.5),transparent 70%)}
+.mark svg{position:relative;filter:drop-shadow(0 1px 1.2px rgba(120,50,0,.45))}
+.mark .cap-board{fill:url(#lg-board);stroke:rgba(255,255,255,.95);stroke-width:.45;stroke-linejoin:round}
+.mark .cap-skull{fill:url(#lg-skull);stroke:rgba(255,255,255,.85);stroke-width:.45;stroke-linejoin:round}
+.mark .cap-shine{stroke:#fff;stroke-width:.7;stroke-linecap:round;fill:none;opacity:.95}
+.mark .cap-tassel{stroke:rgba(255,255,255,.95);fill:none}
+.mark .cap-end{fill:rgba(255,255,255,.95)}
+.mark .cap-grid,.mark .cap-band{display:none}
+.splash .mark{border-radius:30%}
+.splash .mark::after{content:"";position:absolute;inset:-40%;pointer-events:none;
+  background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,.65) 50%,transparent 60%);transform:translateX(-70%);animation:glint 1.4s cubic-bezier(.4,0,.2,1) .55s forwards}
+@keyframes glint{to{transform:translateX(70%)}}
+
+/* ---------- time-of-day knob: plain glass, glass glyphs, no running border ---------- */
+.tod-knob{width:38px;height:38px;--ba:0deg}
+.tod-knob::before{display:none!important}
+.tod-ico{width:26px;height:26px;display:block;overflow:visible}
+.tod-ico .tg{opacity:0;transform-origin:12px 12px;transform:scale(.35) rotate(-110deg);filter:blur(1.6px);
+  transition:opacity .4s ease,transform .75s var(--spring),filter .45s ease}
+.tod-ico .tg.on{opacity:1;transform:none;filter:none}
+.tod-ico .orb{stroke:rgba(255,255,255,.9);stroke-width:.55}
+.tod-ico .ray{stroke-linecap:round;stroke-width:1.9;fill:none}
+.tod-ico .spec{fill:#fff}
+.tod-ico .rim{fill:none;stroke:rgba(255,255,255,.55);stroke-width:.5}
+.tod-ico .g-day{filter:drop-shadow(0 1px 2px rgba(224,123,0,.55))}
+.tod-ico .g-sunset{filter:drop-shadow(0 1px 2px rgba(214,70,40,.5))}
+.tod-ico .g-night{filter:drop-shadow(0 1px 2.5px rgba(120,140,255,.6))}
+
+/* ---------- home ---------- */
+.home{background:
+  radial-gradient(800px 560px at 12% 18%,var(--ambient-a),transparent 62%),
+  radial-gradient(900px 640px at 92% 88%,var(--ambient-b),transparent 64%),
+  radial-gradient(700px 520px at 60% 8%,var(--ambient-c),transparent 60%),var(--bg)}
+.home::before{display:none}
+.splash{background:
+  radial-gradient(700px 500px at 30% 30%,var(--ambient-a),transparent 62%),
+  radial-gradient(800px 560px at 75% 75%,var(--ambient-b),transparent 64%),var(--bg)}
+.hside{border-radius:24px}
+.county{stroke:rgba(255,255,255,.85)}
+.app[data-scene="night"] .county{stroke:rgba(255,255,255,.14)}
+#lift path{stroke:rgba(255,255,255,.95);stroke-width:1.4}
+.hmap svg .dots,.hmap svg .clbls{transition:opacity .45s ease}
+.hmap svg.moving .dots,.hmap svg.moving .clbls{opacity:0;visibility:hidden;transition:none}
+.sdot circle,.sdot rect{stroke:rgba(255,255,255,.95)}
+.app[data-scene="night"] .sdot circle,.app[data-scene="night"] .sdot rect{stroke:rgba(10,12,16,.9)}
+
+/* magnet: transforms are set from JS via the `translate` property */
+.mag-on{will-change:translate}
 </style>
 </head>
 <body>
@@ -399,15 +557,7 @@ button{font-family:inherit;color:inherit}
 
     <div class="home-ui">
       <header class="hbar glass">
-        <span class="mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path class="cap-board" d="M12 3.2 21.2 7.8 12 12.4 2.8 7.8Z"/>
-            <path class="cap-grid" d="M7.4 5.5 16.6 10.1M16.6 5.5 7.4 10.1" stroke-width=".9" stroke-linecap="round" fill="none"/>
-            <path class="cap-band" d="M6.4 9.9V14c0 1.7 2.5 3 5.6 3s5.6-1.3 5.6-3V9.9" fill="none" stroke-width="1.7" stroke-linejoin="round"/>
-            <path class="cap-tassel" d="M12 7.8 19.4 9.6V15" fill="none" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="cap-end" d="M18.4 15h2l.45 3.4h-2.9Z"/>
-          </svg>
-        </span>
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="cap-skull" d="M6.6 9.6 12 12.4 17.4 9.6V14.1c0 1.7-2.4 3-5.4 3s-5.4-1.3-5.4-3Z"/><path class="cap-board" d="M12 3.4 21.2 7.9 12 12.4 2.8 7.9Z"/><path class="cap-shine" d="M5.4 7.25 10.9 4.55"/><path class="cap-tassel" d="M12 7.9 19.4 9.7V15" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path class="cap-end" d="M18.5 15h1.8l.45 3.2h-2.7Z"/></svg></span>
         <div class="brand-t">
           <h1>大專院校 3D 校園地圖</h1>
           <div class="crumb" id="crumb"></div>
@@ -443,35 +593,27 @@ button{font-family:inherit;color:inherit}
 
     <div class="splash" id="splash">
       <div class="splash-in">
-        <span class="mark" aria-hidden="true">
-          <svg viewBox="0 0 24 24">
-            <path class="cap-board" d="M12 3.2 21.2 7.8 12 12.4 2.8 7.8Z"/>
-            <path class="cap-grid" d="M7.4 5.5 16.6 10.1M16.6 5.5 7.4 10.1" stroke-width=".9" stroke-linecap="round" fill="none"/>
-            <path class="cap-band" d="M6.4 9.9V14c0 1.7 2.5 3 5.6 3s5.6-1.3 5.6-3V9.9" fill="none" stroke-width="1.7" stroke-linejoin="round"/>
-            <path class="cap-tassel" d="M12 7.8 19.4 9.6V15" fill="none" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-            <path class="cap-end" d="M18.4 15h2l.45 3.4h-2.9Z"/>
-          </svg>
-        </span>
+        <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="cap-skull" d="M6.6 9.6 12 12.4 17.4 9.6V14.1c0 1.7-2.4 3-5.4 3s-5.4-1.3-5.4-3Z"/><path class="cap-board" d="M12 3.4 21.2 7.9 12 12.4 2.8 7.9Z"/><path class="cap-shine" d="M5.4 7.25 10.9 4.55"/><path class="cap-tassel" d="M12 7.9 19.4 9.7V15" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path class="cap-end" d="M18.5 15h1.8l.45 3.2h-2.7Z"/></svg></span>
         <h1>大專院校 3D 校園地圖</h1>
         <p>Taiwan Campus 3D</p>
       </div>
     </div>
   </section>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+    <linearGradient id="lg-board" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#fff" stop-opacity=".74"/></linearGradient>
+    <linearGradient id="lg-skull" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".5"/><stop offset="1" stop-color="#fff" stop-opacity=".86"/></linearGradient>
+    <radialGradient id="tg-sun" cx=".5" cy=".5" r=".55" fx=".34" fy=".3"><stop offset="0" stop-color="#FFF7DC"/><stop offset=".45" stop-color="#FFC24A"/><stop offset="1" stop-color="#EE8410"/></radialGradient>
+    <linearGradient id="tg-dusk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FFE3AE"/><stop offset=".55" stop-color="#FF8A4C"/><stop offset="1" stop-color="#E0475A"/></linearGradient>
+    <radialGradient id="tg-moon" cx=".5" cy=".5" r=".6" fx=".3" fy=".32"><stop offset="0" stop-color="#fff"/><stop offset=".5" stop-color="#DCE3FF"/><stop offset="1" stop-color="#94A3F2"/></radialGradient>
+    <mask id="tg-moon-cut" maskUnits="userSpaceOnUse" x="0" y="0" width="24" height="24"><rect width="24" height="24" fill="#fff"/><circle cx="15.7" cy="8.8" r="5.9" fill="#000"/></mask>
+  </defs></svg>
   <div id="canvas-container" aria-label="3D 校園互動地圖"></div>
   <div id="labels-layer"></div>
 
   <div class="ui">
     <header class="bar glass">
       <button class="home-back" id="btn-home" type="button" aria-label="回到地圖" title="回到地圖"><svg viewBox="0 0 24 24"><path d="M15 6l-6 6 6 6"/></svg></button>
-      <span class="mark" aria-hidden="true">
-        <svg viewBox="0 0 24 24">
-          <path class="cap-board" d="M12 3.2 21.2 7.8 12 12.4 2.8 7.8Z"/>
-          <path class="cap-grid" d="M7.4 5.5 16.6 10.1M16.6 5.5 7.4 10.1" stroke-width=".9" stroke-linecap="round" fill="none"/>
-          <path class="cap-band" d="M6.4 9.9V14c0 1.7 2.5 3 5.6 3s5.6-1.3 5.6-3V9.9" fill="none" stroke-width="1.7" stroke-linejoin="round"/>
-          <path class="cap-tassel" d="M12 7.8 19.4 9.6V15" fill="none" stroke-width="1.15" stroke-linecap="round" stroke-linejoin="round"/>
-          <path class="cap-end" d="M18.4 15h2l.45 3.4h-2.9Z"/>
-        </svg>
-      </span>
+      <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="cap-skull" d="M6.6 9.6 12 12.4 17.4 9.6V14.1c0 1.7-2.4 3-5.4 3s-5.4-1.3-5.4-3Z"/><path class="cap-board" d="M12 3.4 21.2 7.9 12 12.4 2.8 7.9Z"/><path class="cap-shine" d="M5.4 7.25 10.9 4.55"/><path class="cap-tassel" d="M12 7.9 19.4 9.7V15" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path class="cap-end" d="M18.5 15h1.8l.45 3.2h-2.7Z"/></svg></span>
       <div class="brand-t">
         <h1>大專院校 3D 校園地圖</h1>
         <div class="school-btn"><b id="school-name"></b></div>
@@ -479,7 +621,7 @@ button{font-family:inherit;color:inherit}
     </header>
 
     <div class="tools glass">
-      <button class="tod-knob" id="tod-knob" type="button" aria-label="切換時段"><canvas id="tod-icon"></canvas></button>
+      <button class="tod-knob" id="tod-knob" type="button" aria-label="切換時段"><svg class="tod-ico" viewBox="0 0 24 24" aria-hidden="true"><g class="tg g-day on" data-m="day"><line class="ray" x1="19.10" y1="12.00" x2="21.40" y2="12.00" stroke="#F59E1B"/><line class="ray" x1="17.02" y1="17.02" x2="18.65" y2="18.65" stroke="#F59E1B"/><line class="ray" x1="12.00" y1="19.10" x2="12.00" y2="21.40" stroke="#F59E1B"/><line class="ray" x1="6.98" y1="17.02" x2="5.35" y2="18.65" stroke="#F59E1B"/><line class="ray" x1="4.90" y1="12.00" x2="2.60" y2="12.00" stroke="#F59E1B"/><line class="ray" x1="6.98" y1="6.98" x2="5.35" y2="5.35" stroke="#F59E1B"/><line class="ray" x1="12.00" y1="4.90" x2="12.00" y2="2.60" stroke="#F59E1B"/><line class="ray" x1="17.02" y1="6.98" x2="18.65" y2="5.35" stroke="#F59E1B"/><circle class="orb" cx="12" cy="12" r="4.9" fill="url(#tg-sun)"/><ellipse class="spec" cx="10.3" cy="10.1" rx="1.8" ry="1" transform="rotate(-35 10.3 10.1)" opacity=".9"/></g><g class="tg g-sunset" data-m="sunset"><line class="ray" x1="5.52" y1="12.84" x2="3.54" y2="12.12" stroke="#FF7A45"/><line class="ray" x1="8.04" y1="9.55" x2="6.84" y2="7.83" stroke="#FF7A45"/><line class="ray" x1="12.00" y1="8.30" x2="12.00" y2="6.20" stroke="#FF7A45"/><line class="ray" x1="15.96" y1="9.55" x2="17.16" y2="7.83" stroke="#FF7A45"/><line class="ray" x1="18.48" y1="12.84" x2="20.46" y2="12.12" stroke="#FF7A45"/><path class="orb" d="M6.4 15.2a5.6 5.6 0 0 1 11.2 0Z" fill="url(#tg-dusk)"/><rect x="3.4" y="16.5" width="17.2" height="2.3" rx="1.15" fill="url(#tg-dusk)" stroke="rgba(255,255,255,.9)" stroke-width=".45"/><ellipse class="spec" cx="9.9" cy="12.6" rx="1.5" ry=".75" transform="rotate(-25 9.9 12.6)" opacity=".85"/></g><g class="tg g-night" data-m="night"><circle class="orb" cx="11" cy="13" r="7.2" fill="url(#tg-moon)" mask="url(#tg-moon-cut)"/><ellipse class="spec" cx="7.3" cy="13" rx=".85" ry="2.3" transform="rotate(18 7.3 13)" opacity=".85"/><path d="M18.6 2.9Q18.9 5 21 5.3Q18.9 5.6 18.6 7.7Q18.3 5.6 16.2 5.3Q18.3 5 18.6 2.9Z" fill="url(#tg-moon)" stroke="rgba(255,255,255,.85)" stroke-width=".35"/></g></svg></button>
       <div class="seg" id="tod-seg" role="radiogroup" aria-label="時段">
         <span class="seg-thumb"></span>
         <button type="button" role="radio" data-tod="day" aria-checked="true">日景</button>
@@ -1792,53 +1934,12 @@ function setMinimap(show) {
   if (show) { sizeMinimap(); drawMinimap(); }
 }
 
-// ---------- pixel-dissolve time-of-day icon ----------
+// ---------- time-of-day glyphs (liquid-glass SVG, cross-faded in CSS) ----------
 const REDUCED = matchMedia('(prefers-reduced-motion: reduce)').matches;
-const PIX_SHAPES = {
-  day(g) { g.beginPath(); g.arc(50, 50, 18, 0, Math.PI * 2); g.fill(); g.lineWidth = 9; for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4; g.beginPath(); g.moveTo(50 + Math.cos(a) * 30, 50 + Math.sin(a) * 30); g.lineTo(50 + Math.cos(a) * 44, 50 + Math.sin(a) * 44); g.stroke(); } },
-  sunset(g) { g.beginPath(); g.arc(50, 66, 24, Math.PI, 0); g.fill(); g.fillRect(6, 72, 88, 9); g.lineWidth = 9; [-150, -115, -90, -65, -30].forEach((deg) => { const a = deg * Math.PI / 180; g.beginPath(); g.moveTo(50 + Math.cos(a) * 33, 66 + Math.sin(a) * 33); g.lineTo(50 + Math.cos(a) * 46, 66 + Math.sin(a) * 46); g.stroke(); }); },
-  night(g) { g.beginPath(); g.arc(44, 56, 34, 0, Math.PI * 2); g.fill(); g.globalCompositeOperation = 'destination-out'; g.beginPath(); g.arc(66, 38, 28, 0, Math.PI * 2); g.fill(); g.globalCompositeOperation = 'source-over'; g.fillRect(80, 6, 8, 24); g.fillRect(72, 14, 24, 8); }
-};
-const PIX_COLORS = { day: '#B86200', sunset: '#C2410C', night: '#C9D3FF' };
-function pixSample(fn, n) {
-  const S = n * 6, c = document.createElement('canvas'); c.width = c.height = S; const g = c.getContext('2d');
-  g.fillStyle = g.strokeStyle = '#000'; g.scale(S / 100, S / 100); fn(g);
-  const data = g.getImageData(0, 0, S, S).data, out = [];
-  for (let y = 0; y < n; y++) for (let x = 0; x < n; x++) { let a = 0; for (let j = 1; j < 6; j += 2) for (let i = 1; i < 6; i += 2) a += data[((y * 6 + j) * S + (x * 6 + i)) * 4 + 3]; if (a / 9 > 110) out.push([x, y]); }
-  return out;
-}
 const todIcon = (function () {
-  const cv = document.getElementById('tod-icon'), g = cv.getContext('2d'), n = 14;
-  const shapes = {}; Object.keys(PIX_SHAPES).forEach((k) => { shapes[k] = pixSample(PIX_SHAPES[k], n); });
-  let cur = 'day', anim = null, cell = 1;
-  const rnd = (a, b) => a + Math.random() * (b - a), clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-  function fit() { const dpr = Math.min(window.devicePixelRatio || 1, 2); cv.width = cv.height = Math.round(22 * dpr); cell = cv.width / n; }
-  function paint() { g.clearRect(0, 0, cv.width, cv.height); g.globalAlpha = 1; g.fillStyle = PIX_COLORS[cur]; shapes[cur].forEach(([x, y]) => g.fillRect(x * cell + cell * 0.08, y * cell + cell * 0.08, cell * 0.84, cell * 0.84)); }
-  function to(mode) {
-    const from = cur; cur = mode;
-    if (REDUCED || from === mode) { anim = null; paint(); return; }
-    const parts = [];
-    shapes[from].forEach(([x, y]) => { const a = rnd(0, 6.283), dd = rnd(1.5, n * 0.5); parts.push({ x, y, dx: Math.cos(a) * dd, dy: Math.sin(a) * dd, dl: rnd(0, 0.3), o: 1, c: PIX_COLORS[from] }); });
-    shapes[mode].forEach(([x, y]) => { const a = rnd(0, 6.283), dd = rnd(1.5, n * 0.5); parts.push({ x, y, dx: Math.cos(a) * dd, dy: Math.sin(a) * dd, dl: rnd(0.28, 0.6), o: 0, c: PIX_COLORS[mode] }); });
-    anim = { parts, t0: performance.now() };
-  }
-  function tick(now) {
-    if (!anim) return;
-    const t = (now - anim.t0) / 900;
-    g.clearRect(0, 0, cv.width, cv.height);
-    anim.parts.forEach((p) => {
-      const l = clamp((t - p.dl) / 0.4, 0, 1);
-      const k = p.o ? l * l * l : Math.pow(1 - l, 3), al = p.o ? 1 - l : l;
-      if (al <= 0) return;
-      const s = cell * 0.84 * (p.o ? 1 - 0.45 * l : 0.55 + 0.45 * l);
-      g.globalAlpha = al; g.fillStyle = p.c;
-      g.fillRect((p.x + p.dx * k) * cell + (cell - s) / 2, (p.y + p.dy * k) * cell + (cell - s) / 2, s, s);
-    });
-    g.globalAlpha = 1;
-    if (t > 1.05) { anim = null; paint(); }
-  }
-  fit(); paint();
-  return { to, tick, paint };
+  const gs = document.querySelectorAll('#tod-knob .tg');
+  const to = (mode) => gs.forEach((g) => g.classList.toggle('on', g.dataset.m === mode));
+  return { to, tick() {}, paint() {} };
 })();
 
 // =========================================================================
@@ -2090,7 +2191,7 @@ function animate(now) {
   const defs = document.createElementNS(NS, 'defs');
   const gC = document.createElementNS(NS, 'g'), gLift = document.createElementNS(NS, 'g'), gIns = document.createElementNS(NS, 'g');
   const gLbl = document.createElementNS(NS, 'g'), gDots = document.createElementNS(NS, 'g');
-  gLift.id = 'lift';
+  gLift.id = 'lift'; gDots.setAttribute('class', 'dots'); gLbl.setAttribute('class', 'clbls');
   svg.append(defs, gIns, gC, gLift, gLbl, gDots);
   TW_MAP.counties.forEach((c) => {
     const p = document.createElementNS(NS, 'path');
@@ -2145,15 +2246,16 @@ function animate(now) {
     const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2;
     return [cx - (R[0] + rw / 2) / s, cy - (R[1] + rh / 2) / s, W / s, H / s];
   }
-  function setVB(v) { VB = v; svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' ')); sizeMarks(); }
+  function setVB(v, live) { VB = v; svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' ')); if (!live) sizeMarks(); }
   function animateVB(to, ms = 760) {
     const from = VB.slice(), t0 = performance.now();
     cancelAnimationFrame(vbAnim); animating = true;
+    svg.classList.add('moving');   // markers & labels sit out the zoom: re-sizing 180 of them per frame is what made it stutter
     const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
     const step = (now) => {
       const t = Math.min(1, (now - t0) / ms), k = ease(t);
-      setVB(from.map((f, i) => f + (to[i] - f) * k));
-      if (t < 1) vbAnim = requestAnimationFrame(step); else { animating = false; layoutSchoolLabels(); }
+      setVB(from.map((f, i) => f + (to[i] - f) * k), t < 1);
+      if (t < 1) vbAnim = requestAnimationFrame(step); else { animating = false; layoutSchoolLabels(); svg.classList.remove('moving'); }
     };
     vbAnim = requestAnimationFrame(step);
   }
@@ -2348,6 +2450,72 @@ function animate(now) {
     setTimeout(done, matchMedia('(prefers-reduced-motion: reduce)').matches ? 300 : 1900);
     setTimeout(() => document.getElementById('map-hint').classList.add('gone'), 9000);
   });
+})();
+
+
+// ---------- magnetic controls ----------
+// Every button (and the 3D pins) leans toward the cursor and springs back when it leaves.
+// Uses the individual `translate` property so it stacks on top of whatever `transform` the element already has.
+(function magnet() {
+  if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  const SEL = 'button, .chk, .pin-body';
+  const live = new Map();
+  let cur = null, raf = 0;
+  const clamp = (v, m) => Math.max(-m, Math.min(m, v));
+
+  function track(el, e) {
+    let st = live.get(el);
+    if (!st) {
+      st = { x: 0, y: 0, vx: 0, vy: 0, tx: 0, ty: 0, thumb: null };
+      const seg = el.parentElement && el.parentElement.classList.contains('seg') ? el.parentElement : null;
+      if (seg && el.getAttribute('aria-checked') === 'true') st.thumb = seg.querySelector('.seg-thumb');
+      live.set(el, st); el.classList.add('mag-on');
+    }
+    const r = el.getBoundingClientRect();
+    const left = r.left - st.x, top = r.top - st.y;             // layout box without our own offset
+    const big = Math.max(r.width, r.height);
+    const k = big > 160 ? 0.05 : big > 80 ? 0.14 : 0.32;        // wide list rows barely move, round buttons pull hard
+    const m = big > 160 ? 3 : big > 80 ? 5 : 8;
+    st.tx = clamp((e.clientX - left - r.width / 2) * k, m);
+    st.ty = clamp((e.clientY - top - r.height / 2) * k, m * 0.75);
+    el.style.setProperty('--gx', (((e.clientX - left) / r.width) * 100).toFixed(1) + '%');
+    el.style.setProperty('--gy', (((e.clientY - top) / r.height) * 100).toFixed(1) + '%');
+    kick();
+  }
+  function release(el) {
+    const st = live.get(el);
+    if (st) { st.tx = 0; st.ty = 0; kick(); }
+    el.style.removeProperty('--gx'); el.style.removeProperty('--gy');
+  }
+  function step() {
+    raf = 0;
+    let busy = false;
+    live.forEach((st, el) => {
+      st.vx = (st.vx + (st.tx - st.x) * 0.22) * 0.66;             // damped spring: a little overshoot on release
+      st.vy = (st.vy + (st.ty - st.y) * 0.22) * 0.66;
+      st.x += st.vx; st.y += st.vy;
+      const still = Math.abs(st.tx - st.x) < 0.04 && Math.abs(st.ty - st.y) < 0.04 && Math.abs(st.vx) < 0.04 && Math.abs(st.vy) < 0.04;
+      if (still) { st.x = st.tx; st.y = st.ty; st.vx = st.vy = 0; }
+      const v = st.x || st.y ? `${st.x.toFixed(2)}px ${st.y.toFixed(2)}px` : '';
+      el.style.translate = v;
+      if (st.thumb) st.thumb.style.translate = v;
+      if (still && !st.tx && !st.ty) { live.delete(el); el.classList.remove('mag-on'); return; }
+      if (!still) busy = true;
+    });
+    if (busy) kick();
+  }
+  function kick() { if (!raf) raf = requestAnimationFrame(step); }
+
+  document.addEventListener('pointermove', (e) => {
+    if (e.pointerType !== 'mouse') return;
+    const el = e.target.closest ? e.target.closest(SEL) : null;
+    if (cur && cur !== el) release(cur);
+    cur = el && !el.disabled ? el : null;
+    if (cur) track(cur, e);
+  }, { passive: true });
+  document.addEventListener('pointerout', (e) => { if (!e.relatedTarget && cur) { release(cur); cur = null; } });
+  window.addEventListener('blur', () => { if (cur) { release(cur); cur = null; } });
 })();
 
 </script>
