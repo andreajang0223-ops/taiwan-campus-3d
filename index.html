@@ -357,9 +357,26 @@ button{font-family:inherit;color:inherit}
 /* the map */
 .hmap{position:absolute;inset:0;z-index:0}
 .hmap svg{width:100%;height:100%;display:block;touch-action:manipulation}
-.county{fill:var(--map-land);stroke:var(--map-edge);stroke-width:.9;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .35s,opacity .5s,filter .35s}
+.county{fill:color-mix(in srgb,var(--cc) var(--rg-mix,46%),var(--map-land));stroke:var(--map-edge);stroke-width:.9;vector-effect:non-scaling-stroke;cursor:pointer;transition:fill .35s,opacity .5s,filter .35s}
 .county.dim{opacity:.18;pointer-events:none}
-.county.sel{fill:color-mix(in srgb,var(--cc) 30%,var(--map-land))}
+.county.sel{fill:color-mix(in srgb,var(--cc) 62%,var(--map-land))}
+.county:hover{--rg-mix:60%}
+svg.rg-focus .county{--rg-mix:22%}
+svg.rg-focus .county.rg-hot{--rg-mix:80%}
+.app[data-scene="night"] .county{--rg-mix:34%}
+.app[data-scene="night"] svg.rg-focus .county{--rg-mix:14%}
+.app[data-scene="night"] svg.rg-focus .county.rg-hot{--rg-mix:62%}
+.rhead{display:flex;align-items:center;gap:8px;margin:12px 4px 4px;padding:6px 8px;border-radius:10px;font-size:12.5px;cursor:default;transition:background .2s}
+.rhead:first-child{margin-top:2px}
+.rhead .sw{flex:none;width:14px;height:14px;border-radius:5px;background:var(--c);box-shadow:inset 0 0 0 1px rgba(255,255,255,.5),0 2px 6px -2px var(--c)}
+.rhead b{font-size:13px;letter-spacing:.06em}
+.rhead small{flex:1;font-size:11px;color:var(--muted)}
+.rhead .n{font:700 11.5px var(--f-mono);color:var(--muted)}
+.rhead.hot{background:color-mix(in srgb,var(--c) 18%,transparent)}
+.hlist .crow{padding-left:14px}
+.lg i.rg{border-radius:3px;border:0}
+.lg-sep{flex-basis:100%;height:0}
+.hlegend{row-gap:6px;justify-content:flex-end;max-width:520px}
 #lift path{pointer-events:none;opacity:0;transform-box:fill-box;transform-origin:50% 60%;transition:transform .45s var(--spring),opacity .35s;fill:var(--cc);stroke:color-mix(in srgb,var(--cc) 60%,#000);stroke-width:1.2;vector-effect:non-scaling-stroke;filter:drop-shadow(0 10px 10px rgba(10,14,20,.28))}
 #lift path.up{opacity:1;transform:translateY(-1.4%) scale(1.06)}
 .inset-box{fill:none;stroke:var(--line);stroke-width:1;stroke-dasharray:4 4;vector-effect:non-scaling-stroke;transition:opacity .4s}
@@ -430,7 +447,8 @@ button{font-family:inherit;color:inherit}
   border:0;border-radius:24px;
   box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi),inset 0 -1px 0 var(--g-lo),inset 0 0 24px -10px var(--g-sheen),0 0 0 .5px var(--g-edge),var(--g-shadow);
 }
-.hint.glass,.map-hint.glass,.hlegend.glass{border-radius:999px}
+.hint.glass,.map-hint.glass{border-radius:999px}
+.hlegend.glass{border-radius:18px}
 .tooltip.glass{border-radius:16px}
 .wip-card.glass{border-radius:30px}
 .bar,.hbar,.tools{border-radius:22px}
@@ -549,10 +567,18 @@ button{font-family:inherit;color:inherit}
 .mag-on{will-change:translate}
 
 /* ---------- campus switcher (3D view) ---------- */
-.campus-sw{display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;margin:2px -2px 0;padding:2px}
+.campus-sw{display:grid;grid-template-columns:auto minmax(0,1fr);grid-template-areas:"l t" ". h";align-items:center;column-gap:6px;row-gap:1px;margin:2px -2px 0;padding:2px}
 .campus-sw[hidden]{display:none}
-.campus-sw::-webkit-scrollbar{display:none}
-.cs-lbl{flex:none;font:700 11px var(--f-body);color:var(--muted);letter-spacing:.08em;margin-right:2px}
+.cs-track{grid-area:t;display:flex;align-items:center;gap:6px;overflow-x:auto;scrollbar-width:none;padding:2px;scroll-padding:0 24px;
+  --fl:0px;--fr:0px;-webkit-mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%);mask-image:linear-gradient(90deg,transparent 0,#000 var(--fl),#000 calc(100% - var(--fr)),transparent 100%)}
+.cs-track::-webkit-scrollbar{display:none}
+.campus-sw.more-l .cs-track{--fl:26px}.campus-sw.more-r .cs-track{--fr:26px}
+.cs-n{display:block;font:700 10.5px var(--f-mono);letter-spacing:0;color:var(--accent-ink);margin-top:1px;font-variant-numeric:tabular-nums}
+.cs-hint{grid-area:h;justify-self:end;display:flex;align-items:center;gap:4px;font-size:10.5px;color:var(--muted);opacity:.75;padding-right:4px;transition:opacity .2s,color .2s}
+.campus-sw:hover .cs-hint,.campus-sw.wheeling .cs-hint{opacity:1;color:var(--accent-ink)}
+.campus-sw.wheeling .cs-btn.on{animation:csPulse .5s ease}
+@keyframes csPulse{0%{transform:scale(.92)}60%{transform:scale(1.04)}100%{transform:none}}
+.cs-lbl{grid-area:l;flex:none;text-align:center;font:700 11px var(--f-body);color:var(--muted);letter-spacing:.08em;margin-right:2px}
 .cs-btn{flex:none;display:flex;align-items:center;gap:5px;border:0;border-radius:999px;padding:5px 11px 5px 9px;font:600 12.5px var(--f-body);color:var(--ink);cursor:pointer;
   background:var(--g-fill);box-shadow:inset 0 0 0 1px var(--g-rim),inset 0 1px 0 var(--g-hi);transition:background .25s,box-shadow .25s,transform .45s var(--spring)}
 .cs-btn small{font-size:10.5px;color:var(--muted);font-weight:500}
@@ -566,6 +592,10 @@ button{font-family:inherit;color:inherit}
 .sdot.campus.ready rect{fill:var(--accent)}
 .lg i.ring{background:var(--bg)}
 .srow .camp{font-size:10.5px;color:var(--muted)}
+/* hollow markers (closed schools, branch campuses) stay readable on region-tinted land */
+.sdot.gone circle,.app[data-scene="night"] .sdot.gone circle{fill:rgba(255,255,255,.92);stroke:var(--sc);stroke-width:1.8}
+.app[data-scene="night"] .sdot.gone circle{fill:rgba(20,23,28,.9);stroke:color-mix(in srgb,var(--sc) 70%,#fff)}
+.app[data-scene="night"] .sdot.campus circle{fill:rgba(20,23,28,.9);stroke:var(--sc)}
 </style>
 </head>
 <body>
@@ -608,6 +638,12 @@ button{font-family:inherit;color:inherit}
         <span class="lg"><i class="ring" style="--sc:var(--c-gen)"></i>其他校區</span>
         <span class="lg"><i class="hollow" style="--sc:var(--muted)"></i>已退場／合併</span>
         <span class="lg"><i class="star" style="--sc:var(--accent)"></i>3D 已完成</span>
+        <span class="lg-sep"></span>
+        <span class="lg"><i class="rg" style="--sc:#9A9BE6"></i>北部</span>
+        <span class="lg"><i class="rg" style="--sc:#7FC79A"></i>中部</span>
+        <span class="lg"><i class="rg" style="--sc:#F09A84"></i>南部</span>
+        <span class="lg"><i class="rg" style="--sc:#6EC3CF"></i>東部</span>
+        <span class="lg"><i class="rg" style="--sc:#E3BE5E"></i>離島</span>
       </div>
     </div>
 
@@ -1890,12 +1926,37 @@ function renderCampusSwitch(id) {
   const root = SCHOOL_LIST.find((x) => x.id === rootId);
   if (!root || !root.campuses || root.campuses.length < 2) { sw.hidden = true; sw.innerHTML = ''; return; }
   sw.hidden = false;
-  sw.innerHTML = '<span class="cs-lbl">校區</span>' + root.campuses.map((c) => {
-    const cid = c.k === 'main' ? rootId : rootId + '@' + c.k;
+  const ids = root.campuses.map((c) => (c.k === 'main' ? rootId : rootId + '@' + c.k));
+  const cur = Math.max(0, ids.indexOf(id));
+  sw.innerHTML = `<span class="cs-lbl">校區<b class="cs-n">${cur + 1}/${ids.length}</b></span><div class="cs-track">` + root.campuses.map((c, i) => {
+    const cid = ids[i];
     const r = SCHOOL[cid];
     return `<button type="button" class="cs-btn${cid === id ? ' on' : ''}${r && r.ready ? ' ready' : ''}" data-cs="${cid}" title="${c.county}${r && r.ready ? '・3D 完成' : '・施工中'}">${c.k === 'main' ? '<i>主</i>' : ''}${c.label}<small>${c.county}</small></button>`;
-  }).join('');
-  sw.querySelectorAll('[data-cs]').forEach((b) => b.addEventListener('click', () => { if (b.dataset.cs !== state.uniId) window.homeGo('#/s/' + b.dataset.cs); }));
+  }).join('') + '</div><span class="cs-hint" aria-hidden="true"><svg viewBox="0 0 12 18" width="9" height="14"><rect x="1" y="1" width="10" height="16" rx="5" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="5.2" y="4" width="1.6" height="4" rx=".8" fill="currentColor"/></svg>滾輪切換</span>';
+  const track = sw.querySelector('.cs-track'), btns = [...sw.querySelectorAll('[data-cs]')], nEl = sw.querySelector('.cs-n');
+  const go = (cid) => { if (cid !== state.uniId) window.homeGo('#/s/' + cid); };
+  btns.forEach((b) => b.addEventListener('click', () => { clearTimeout(sw._t); go(b.dataset.cs); }));
+  const centre = (b, smooth) => track.scrollTo({ left: b.offsetLeft - (track.clientWidth - b.offsetWidth) / 2, behavior: smooth ? 'smooth' : 'auto' });
+  const edges = () => { sw.classList.toggle('more-l', track.scrollLeft > 2); sw.classList.toggle('more-r', track.scrollLeft < track.scrollWidth - track.clientWidth - 2); };
+  track.addEventListener('scroll', edges, { passive: true });
+  requestAnimationFrame(() => { centre(btns[cur], false); edges(); });
+  // mouse wheel: step through campuses (highlight moves at once, the 3D map loads when the wheel rests)
+  let pend = cur, acc = 0, lastStep = 0;
+  sw.onwheel = (e) => {
+    e.preventDefault(); e.stopPropagation();
+    const d = (Math.abs(e.deltaY) >= Math.abs(e.deltaX) ? e.deltaY : e.deltaX) * (e.deltaMode === 1 ? 40 : e.deltaMode === 2 ? 400 : 1);
+    acc += d;
+    const now = performance.now();
+    if (Math.abs(acc) < 30 || now - lastStep < 140) return;
+    const step = acc > 0 ? 1 : -1; acc = 0; lastStep = now;
+    pend = (pend + step + ids.length) % ids.length;
+    btns.forEach((b, i) => b.classList.toggle('on', i === pend));
+    nEl.textContent = `${pend + 1}/${ids.length}`;
+    centre(btns[pend], true);
+    sw.classList.add('wheeling');
+    clearTimeout(sw._t);
+    sw._t = setTimeout(() => { sw.classList.remove('wheeling'); go(ids[pend]); }, 520);
+  };
 }
 
 function rebuildScene() {
@@ -2236,13 +2297,21 @@ function animate(now) {
   const splash = document.getElementById('splash');
   const NS = 'http://www.w3.org/2000/svg';
   const HS = { sys: 'all', showGone: true, county: null, hoverCounty: null, hotSchool: null };
-  const PALETTE = ['#F2B263', '#8EC5A4', '#86B7E8', '#E89A9A', '#C7A8E3', '#E8C76A', '#7FC9C4', '#F0A27A'];
   const STATUS_TXT = { closed: '已停辦', merged: '已合併', stopping: '停招中' };
   window.HOME_OPEN = true;
 
   // ---------- projection (same as the generator) ----------
   const P = TW_MAP.proj;
-  const CBY = Object.fromEntries(TW_MAP.counties.map((c, i) => [c.name, Object.assign(c, { i, col: PALETTE[i % PALETTE.length] })]));
+  // five regions (國發會 區域劃分; 澎湖・金門・連江 as 離島)
+  const REGIONS = [
+    { k: 'n', name: '北部', en: 'North', col: '#9A9BE6', list: ['臺北市', '新北市', '基隆市', '桃園市', '新竹市', '新竹縣', '宜蘭縣'] },
+    { k: 'c', name: '中部', en: 'Central', col: '#7FC79A', list: ['苗栗縣', '臺中市', '彰化縣', '南投縣', '雲林縣'] },
+    { k: 's', name: '南部', en: 'South', col: '#F09A84', list: ['嘉義市', '嘉義縣', '臺南市', '高雄市', '屏東縣'] },
+    { k: 'e', name: '東部', en: 'East', col: '#6EC3CF', list: ['花蓮縣', '臺東縣'] },
+    { k: 'i', name: '離島', en: 'Islands', col: '#E3BE5E', list: ['澎湖縣', '金門縣', '連江縣'] },
+  ];
+  const REG_OF = {}; REGIONS.forEach((r) => r.list.forEach((n) => { REG_OF[n] = r; }));
+  const CBY = Object.fromEntries(TW_MAP.counties.map((c, i) => { const r = REG_OF[c.name] || REGIONS[0]; return [c.name, Object.assign(c, { i, reg: r.k, col: r.col })]; }));
   function project(s) {
     let x = (s.lon - P.lon0) * P.c * P.k, y = (P.lat0 - s.lat) * P.k;
     const c = CBY[s.county];
@@ -2263,7 +2332,7 @@ function animate(now) {
   svg.append(defs, gIns, gC, gLift, gLbl, gDots);
   TW_MAP.counties.forEach((c) => {
     const p = document.createElementNS(NS, 'path');
-    p.setAttribute('d', c.d); p.id = 'cty-' + c.i; p.classList.add('county'); p.style.setProperty('--cc', c.col);
+    p.setAttribute('d', c.d); p.id = 'cty-' + c.i; p.classList.add('county', 'rg-' + c.reg); p.style.setProperty('--cc', c.col);
     p.dataset.name = c.name;
     p.addEventListener('pointerenter', () => hoverCounty(c.name));
     p.addEventListener('pointerleave', () => hoverCounty(null));
@@ -2385,6 +2454,12 @@ function animate(now) {
     });
     document.querySelectorAll('.crow[data-county]').forEach((r) => r.classList.toggle('hot', r.dataset.county === name));
   }
+  function hoverRegion(k) {
+    if (HS.county) return;
+    svg.classList.toggle('rg-focus', !!k);
+    TW_MAP.counties.forEach((c) => c.el.classList.toggle('rg-hot', c.reg === k));
+    document.querySelectorAll('.rhead').forEach((h) => h.classList.toggle('hot', h.dataset.reg === k));
+  }
   function hotSchool(id, on) {
     const s = SCHOOL_LIST.find((x) => x.id === id); if (!s || !s.el || (on && animating)) return;
     s.el.classList.toggle('hot', on);
@@ -2413,8 +2488,17 @@ function animate(now) {
         `<span class="stat"><b>${vis.length - mainVis.length}</b>個其他校區</span><span class="stat"><b>${vis.filter((s) => s.ready).length}</b>處 3D 完成</span>`;
       const counts = {}, ccount = {};
       vis.forEach((s) => { if (s.campusOf) ccount[s.county] = (ccount[s.county] || 0) + 1; else counts[s.county] = (counts[s.county] || 0) + 1; });
-      const rows = TW_MAP.counties.slice().sort((a, b) => (counts[b.name] || 0) - (counts[a.name] || 0) || a.name.localeCompare(b.name, 'zh-Hant'));
-      listEl.innerHTML = rows.map((c) => `<button type="button" class="crow" data-county="${c.name}" style="--c:${c.col}"><span class="sw"></span><span class="t"><b>${c.name}</b><small>${c.en}</small></span><span class="n">${counts[c.name] || 0} 所${ccount[c.name] ? `<small class="camp"> +${ccount[c.name]} 校區</small>` : ''}</span></button>`).join('');
+      const byCount = (a, b) => (counts[b.name] || 0) - (counts[a.name] || 0) || a.name.localeCompare(b.name, 'zh-Hant');
+      listEl.innerHTML = REGIONS.map((rg) => {
+        const rows = TW_MAP.counties.filter((c) => c.reg === rg.k).sort(byCount);
+        const n = rows.reduce((t, c) => t + (counts[c.name] || 0), 0);
+        return `<div class="rhead" data-reg="${rg.k}" style="--c:${rg.col}"><span class="sw"></span><b>${rg.name}</b><small>${rg.en}</small><span class="n">${n} 所</span></div>` +
+          rows.map((c) => `<button type="button" class="crow" data-county="${c.name}" style="--c:${c.col}"><span class="sw"></span><span class="t"><b>${c.name}</b><small>${c.en}</small></span><span class="n">${counts[c.name] || 0} 所${ccount[c.name] ? `<small class="camp"> +${ccount[c.name]} 校區</small>` : ''}</span></button>`).join('');
+      }).join('');
+      listEl.querySelectorAll('.rhead').forEach((h) => {
+        h.addEventListener('pointerenter', () => hoverRegion(h.dataset.reg));
+        h.addEventListener('pointerleave', () => hoverRegion(null));
+      });
       listEl.querySelectorAll('.crow').forEach((r) => {
         r.addEventListener('pointerenter', () => hoverCounty(r.dataset.county));
         r.addEventListener('pointerleave', () => hoverCounty(null));
