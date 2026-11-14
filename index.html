@@ -2345,6 +2345,8 @@ document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && state.se
 function switchUniversity(id) {
   const s = SCHOOL[id];
   state.uniId = id; state.selectedZone = 'all'; state.searchQuery = ''; state.selectedId = null;
+  if (selectionRing) selectionRing.visible = false;   // the ring of a building picked in the previous school must not linger here
+  setInspector(null);
   document.getElementById('building-search').value = '';
   document.querySelectorAll('.zone-btn').forEach((b) => b.classList.toggle('on', b.dataset.zone === 'all'));
   document.getElementById('school-name').textContent = s.name;
@@ -2424,6 +2426,7 @@ function renderCampusSwitch(id) {
 
 function rebuildScene() {
   clearCampus();
+  if (selectionRing) selectionRing.visible = false;
   if (CAMPUS.id === 'wip') {
     const c = Object.assign({}, CAMPUS, { buildings: CAMPUS._fake });
     buildCampus(c);
@@ -2433,6 +2436,7 @@ function rebuildScene() {
   buildCampus(CAMPUS);
   buildLabels();
   if (state.selectedId && BLD[state.selectedId]) placeRing(state.selectedId);
+  else { state.selectedId = null; if (selectionRing) selectionRing.visible = false; }
 }
 
 function renderBuildingDirectory() {
