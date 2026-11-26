@@ -600,6 +600,7 @@ svg.rg-focus .county.rg-hot{--rg-mix:80%}
 .sdot.gone circle,.app[data-scene="night"] .sdot.gone circle{fill:rgba(255,255,255,.92);stroke:var(--sc);stroke-width:1.8}
 .app[data-scene="night"] .sdot.gone circle{fill:rgba(20,23,28,.9);stroke:color-mix(in srgb,var(--sc) 70%,#fff)}
 .app[data-scene="night"] .sdot.campus circle{fill:rgba(20,23,28,.9);stroke:var(--sc)}
+.series-link{text-decoration:none}
 </style>
 </head>
 <body>
@@ -610,6 +611,7 @@ svg.rg-focus .county.rg-hot{--rg-mix:80%}
 
     <div class="home-ui">
       <header class="hbar glass">
+        <a class="home-back series-link" href="https://andreajang0223-ops.github.io/" aria-label="回到臺灣校園 3D 地圖系列主頁" title="回到系列主頁"><svg viewBox="0 0 24 24"><path d="M3.8 11.2 12 4.6l8.2 6.6"/><path d="M6.3 9.6V19.4h11.4V9.6"/><path d="M10.2 19.4v-4.6h3.6v4.6"/></svg></a>
         <span class="mark" aria-hidden="true"><svg viewBox="0 0 24 24"><path class="cap-skull" d="M6.6 9.6 12 12.4 17.4 9.6V14.1c0 1.7-2.4 3-5.4 3s-5.4-1.3-5.4-3Z"/><path class="cap-board" d="M12 3.4 21.2 7.9 12 12.4 2.8 7.9Z"/><path class="cap-shine" d="M5.4 7.25 10.9 4.55"/><path class="cap-tassel" d="M12 7.9 19.4 9.7V15" stroke-width="1.1" stroke-linecap="round" stroke-linejoin="round"/><path class="cap-end" d="M18.5 15h1.8l.45 3.2h-2.7Z"/></svg></span>
         <div class="brand-t">
           <h1>大專院校 3D 校園地圖</h1>
@@ -3073,7 +3075,7 @@ function animate(now) {
     const cx = (bb[0] + bb[2]) / 2, cy = (bb[1] + bb[3]) / 2;
     return [cx - (R[0] + rw / 2) / s, cy - (R[1] + rh / 2) / s, W / s, H / s];
   }
-  function setVB(v, live) { VB = v; svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' ')); if (!live) sizeMarks(); }
+  function setVB(v, live) { if (!(v[2] > 0 && v[3] > 0)) return; VB = v; svg.setAttribute('viewBox', v.map((n) => n.toFixed(2)).join(' ')); if (!live) sizeMarks(); }
   function animateVB(to, ms = 760) {
     const from = VB.slice(), t0 = performance.now();
     cancelAnimationFrame(vbAnim); animating = true;
